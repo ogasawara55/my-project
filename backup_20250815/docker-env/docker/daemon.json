@@ -1,0 +1,9 @@
+{
+  "experimental": true,
+  "features": {
+    "buildkit": true
+  },
+  "registry-mirrors": [
+    "https://mirror.gcr.io"
+  ]
+}

@@ -1,0 +1,126 @@
+@extends('layouts.app')
+
+@section('title', 'ブックマーク確認')
+
+@section('content')
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-bookmark me-2"></i>ブックマーク確認
+                    </h4>
+                </div>
+                
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        以下の求人をブックマークに追加しますか？
+                    </div>
+                    
+                    <!-- 求人情報表示 -->
+                    <div class="card mb-4">
+                        @if($job->image_url)
+                            <img src="{{ $job->image_url }}" class="card-img-top" style="height: 250px; object-fit: cover;" alt="求人画像">
+                        @else
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                                <i class="fas fa-building fa-4x text-muted"></i>
+                            </div>
+                        @endif
+                        
+                        <div class="card-body">
+                            <h5 class="card-title">{{ $job->title }}</h5>
+                            <h6 class="text-muted mb-3">
+                                <i class="fas fa-building me-2"></i>{{ $job->company->company_name }}
+                            </h6>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-2">
+                                        <strong><i class="fas fa-map-marker-alt me-2 text-primary"></i>勤務地:</strong><br>
+                                        {{ $job->location }}
+                                    </p>
+                                    <p class="mb-2">
+                                        <strong><i class="fas fa-yen-sign me-2 text-success"></i>給与:</strong><br>
+                                        {{ $job->salary_range }}
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-2">
+                                        <strong><i class="fas fa-briefcase me-2 text-info"></i>雇用形態:</strong><br>
+                                        {{ $job->employment_type }}
+                                    </p>
+                                    <p class="mb-2">
+                                        <strong><i class="fas fa-clock me-2 text-warning"></i>投稿日:</strong><br>
+                                        {{ $job->created_at->format('Y年m月d日') }}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            @if($job->description)
+                                <div class="mt-3">
+                                    <strong><i class="fas fa-file-alt me-2 text-secondary"></i>仕事内容:</strong>
+                                    <p class="mt-2">{{ Str::limit($job->description, 200) }}</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    <!-- 確認ボタン -->
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <form action="{{ route('job_seeker.bookmarks.store', $job->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-success btn-lg w-100">
+                                    <i class="fas fa-bookmark me-2"></i>ブックマークに追加
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <a href="{{ route('jobs.show', $job->id) }}" class="btn btn-outline-secondary btn-lg w-100">
+                                <i class="fas fa-arrow-left me-2"></i>求人詳細に戻る
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-lightbulb me-1"></i>
+                            ブックマークした求人は、マイページから簡単にアクセスできます。
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ブックマーク済みの場合の注意 -->
+            @if($isBookmarked ?? false)
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    この求人は既にブックマーク済みです。
+                    <a href="{{ route('job_seeker.bookmarks.index') }}" class="alert-link">ブックマーク一覧</a>で確認できます。
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+
+<style>
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card {
+    border: none;
+}
+
+.card-img-top {
+    border-radius: 0.375rem 0.375rem 0 0;
+}
+</style>
+@endsection

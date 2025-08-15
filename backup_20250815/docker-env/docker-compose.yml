@@ -1,0 +1,58 @@
+services:
+  nginx:
+    container_name: curriculum-nginx
+    image: nginx:latest
+    volumes:
+      - ./docker/nginx:/etc/nginx/conf.d
+      - ./app:/var/www/html
+    ports:
+      - "80:80"
+    depends_on:
+      - php
+  php:
+    container_name: curriculum-laravel
+    ###############################################################
+    # Mac M1チップユーザーは以下のコメントアウトを解除して作業を進めてください
+    # platform: linux/x86_64
+    ###############################################################
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    volumes:
+      - ./app:/var/www/html
+      - ./docker/php/check_startup.sh:/tmp/check_startup.sh
+    expose:
+      - "9000"
+    depends_on:
+      - db
+  db:
+    container_name: curriculum-db
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      timeout: 10s
+      retries: 5
+      interval: 10s
+  phpmyadmin:
+    container_name: curriculum-phpmyadmin
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=db
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+    depends_on:
+      - db
+    ports:
+      - "4040:80"
+    volumes:
+      - ./phpmyadmin/sessions:/sessions
+volumes:
+  db_data:
